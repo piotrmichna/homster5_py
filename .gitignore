@@ -1,0 +1,9 @@
+venv/
+.idea/
+*.swp
+*.*.swp
+__pycache__/
+*$py.class
+*.log
+local_*.py
+.vscode/
