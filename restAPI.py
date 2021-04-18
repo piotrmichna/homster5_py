@@ -64,9 +64,9 @@ class RestApi(object):
         pm = PoolManager()
         rqst = pm.request('GET', rest_url)
         if rqst.status == 200:
-            return [rqst.status, json.load(rqst.data.decode('utf-8'))]
+            return {'status': rqst.status, 'data': json.load(rqst.data.decode('utf-8'))}
         else:
-            return [rqst.status]
+            return {'status': rqst.status}
 
     def send_data(self, endpoint=None, url_data=None, send_data=None, method='POST'):
         if type(send_data) is dict and len(send_data) and self.api_url:
@@ -78,6 +78,6 @@ class RestApi(object):
                               rest_url,
                               headers={'Content-Type': 'application/json'},
                               body=encoded_data)
-            return [rqst.status, json.load(rqst.data.decode('utf-8'))]
+            return {'status': rqst.status, 'data': json.load(rqst.data.decode('utf-8'))}
         else:
             return None
