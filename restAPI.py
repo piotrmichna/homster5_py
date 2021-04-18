@@ -1,4 +1,7 @@
+import json
 from urllib.parse import urlencode
+
+from urllib3 import PoolManager
 
 
 class RestApi(object):
