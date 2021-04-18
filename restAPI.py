@@ -41,3 +41,16 @@ class RestApi(object):
                     self.api_url = None
             else:
                 self.api_url = None
+
+    def get_rest_url(self, urldata=None):
+        if self.api_url:
+            if self.endpoint:
+                url_rest = self.api_url + self.endpoint
+            else:
+                url_rest = self.api_url
+            if type(urldata) is dict and len(urldata):
+                return url_rest + '?' + urlencode(urldata)
+            else:
+                return url_rest
+        else:
+            return None
