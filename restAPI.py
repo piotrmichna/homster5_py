@@ -5,6 +5,7 @@ class RestApi(object):
         self.endpoint = None
         self.api_url = None
         self.set_end_point(endpoint)
+        self.set_api_url(self.API_URL)
 
     def set_end_point(self, endpoint=None):
         if endpoint:
