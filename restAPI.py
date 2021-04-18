@@ -1,3 +1,6 @@
+from urllib.parse import urlencode
+
+
 class RestApi(object):
     API_URL = 'http://homster.pl/rest/'
 
