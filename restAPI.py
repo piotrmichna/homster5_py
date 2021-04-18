@@ -57,3 +57,13 @@ class RestApi(object):
                 return url_rest
         else:
             return None
+
+    def get_data(self, endpoint=None, url_data=None):
+        self.set_end_point(endpoint)
+        rest_url = self.get_rest_url(url_data)
+        pm = PoolManager()
+        rqst = pm.request('GET', rest_url)
+        if rqst.status == 200:
+            return [rqst.status, json.load(rqst.data.decode('utf-8'))]
+        else:
+            return [rqst.status]
