@@ -67,3 +67,17 @@ class RestApi(object):
             return [rqst.status, json.load(rqst.data.decode('utf-8'))]
         else:
             return [rqst.status]
+
+    def send_data(self, endpoint=None, url_data=None, send_data=None, method='POST'):
+        if type(send_data) is dict and len(send_data) and self.api_url:
+            self.set_end_point(endpoint)
+            rest_url = self.get_rest_url(url_data)
+            encoded_data = json.dumps(send_data).encode('utf-8')
+            pm = PoolManager()
+            rqst = pm.request(method,
+                              rest_url,
+                              headers={'Content-Type': 'application/json'},
+                              body=encoded_data)
+            return [rqst.status, json.load(rqst.data.decode('utf-8'))]
+        else:
+            return None
