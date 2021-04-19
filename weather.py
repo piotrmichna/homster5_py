@@ -9,6 +9,8 @@ class Weather(object):
     def get_cfg(self):
         api = RestApi()
         rest = api.get_data('cfg/weather/')
+        print(f"odpowiedź {rest['status']}")
+        print(f"api_url {api.get_rest_url()}")
         if rest['status'] == 200:
             commands = rest['data']['results']
             for com in commands:
