@@ -75,6 +75,7 @@ class RestApi(object):
         if type(send_data) is dict and len(send_data) and self.api_url:
             self.set_end_point(endpoint)
             rest_url = self.get_rest_url(url_data)
+            print(f'rest_url={rest_url}')
             encoded_data = json.dumps(send_data).encode('utf-8')
             pm = PoolManager()
             rqst = pm.request(method,
