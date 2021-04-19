@@ -123,14 +123,10 @@ class Weather(object):
 
 if __name__ == '__main__':
     weat = Weather()
-    weat.get_rest_cfg()
     i = 2
+    sv = False
     while i:
-        i -= 1
-        print(f'--------- POMIAR {2 - i} ----------')
-        n = 10
-        while n:
-            weat.get_measure()
-            n -= 1
-            sleep(1)
-        weat.save_measure()
+        sv = weat.event()
+        if sv:
+            i -= 1
+            print(f'--------- ZAPIS {2 - i} ----------')
