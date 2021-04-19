@@ -6,11 +6,9 @@
 
 import smbus2
 
-# Get I2C bus
-bus = smbus2.SMBus(1)
-
 # I2C address of the device
 MAX44009_DEFAULT_ADDRESS = 0x4A
+MAX44009_PORT = 1
 
 # MAX44009 Register Map
 MAX44009_REG_INTR_STATUS = 0x00  # Interrupt Status Register
@@ -54,25 +52,55 @@ MAX44009_REG_CONFIG_INTRTIMER_12_5 = 0x06
 MAX44009_REG_CONFIG_INTRTIMER_6_25 = 0x07
 
 
-class MAX44009():
-    def __init__(self):
+class Max44009(object):
+    PORT = MAX44009_PORT
+    ADDRESS = MAX44009_DEFAULT_ADDRESS
+
+    def __init__(self, adr=None, port=None):
+        self.luminance = 0
+        self.ADDRESS = None
+        self.PORT = None
+        self.set_adres(adr, port)
+
+        self.buss = smbus2.SMBus(self.PORT)
+        self.CONFIG = (MAX44009_REG_CONFIG_CONTMODE_CONTIN | MAX44009_REG_CONFIG_MANUAL_MODEON |
+                       MAX44009_REG_CONFIG_CDR_NODIVIDED | MAX44009_REG_CONFIG_INTRTIMER_800)
         self.write_config()
 
+    def set_adres(self, adr=None, port=None):
+        self.PORT = Max44009.PORT
+        self.ADDRESS = Max44009.ADDRESS
+        if adr:
+            if '0x' in adr and len(adr) == 4:
+                self.ADDRESS = adr
+
+        if port:
+            if port.isdigit():
+                try:
+                    port = int(port)
+                    if port < 10:
+                        self.PORT = port
+                    else:
+                        self.PORT = Max44009.PORT
+                except ValueError:
+                    pass
+
     def write_config(self):
-        """Select the configuration register data from the given provided values"""
-        CONFIG = (MAX44009_REG_CONFIG_CONTMODE_CONTIN | MAX44009_REG_CONFIG_MANUAL_MODEON |
-                  MAX44009_REG_CONFIG_CDR_NODIVIDED | MAX44009_REG_CONFIG_INTRTIMER_800)
-        bus.write_byte_data(MAX44009_DEFAULT_ADDRESS,
-                            MAX44009_REG_CONFIG, CONFIG)
+        self.buss.write_byte_data(self.ADDRESS, MAX44009_REG_CONFIG, self.CONFIG)
 
-    def read_lumninance(self):
-        """Read data back from MAX44009_REG_LUX_HIGH(0x03), 2 bytes, luminance MSB, luminance LSB"""
-        data = bus.read_i2c_block_data(
-            MAX44009_DEFAULT_ADDRESS, MAX44009_REG_LUX_HIGH, 2)
-
-        # Convert the data to lux
+    def get_luminance(self):
+        data = self.buss.read_i2c_block_data(self.ADDRESS, MAX44009_REG_LUX_HIGH, 2)
         exponent = (data[0] & 0xF0) >> 4
         mantissa = ((data[0] & 0x0F) << 4) | (data[1] & 0x0F)
-        luminance = ((2 ** exponent) * mantissa) * 0.045
+        self.luminance = round(((2 ** exponent) * mantissa) * 0.045, 2)
 
-        return {'l': luminance}
+        return self.luminance
+
+    def print_luminance(self):
+        print(f'Jasność światła={self.luminance}lx')
+
+
+if __name__ == '__main__':
+    lx = Max44009()
+    lx.get_luminance()
+    lx.print_luminance()
