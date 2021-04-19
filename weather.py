@@ -69,7 +69,7 @@ class Weather(object):
     def get_rest_cfg(self):
         api = RestApi()
         rest = api.get_data(self.CFG_ENDPOINT)
-        print(f"api_url {api.get_rest_url()} status={rest['status']}")
+        # print(f"api_url {api.get_rest_url()} status={rest['status']}")
         if rest['status'] == 200:
             self.cfg_status = rest['status']
             commands = rest['data']['results']
@@ -96,7 +96,7 @@ class Weather(object):
             self.measure = [0 for _ in self.measure]
             api = RestApi()
             rest = api.send_data(self.SV_ENDPOINT, None, measure_data)
-            print(f'status={rest["status"]}')
+            # print(f'status={rest["status"]}')
 
 
 if __name__ == '__main__':
