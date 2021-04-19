@@ -1,5 +1,4 @@
 from datetime import datetime
-from time import sleep
 
 from max44009 import Max44009
 from restAPI import RestApi
@@ -44,11 +43,14 @@ class Weather(object):
         self.sv_sns = None  # int [min]
         self.week_sns = False  # boolean
         self.long_sns = False  # boolean
+        self.new_sns_id = 0
         self.CFG_ENDPOINT = Weather.CFG_ENDPOINT
         self.SV_ENDPOINT = Weather.SV_ENDPOINT
         self.cfg_status = None
         self.bme = Bme280Sensor()
         self.max4 = Max44009()
+        self.tms = datetime.now()
+        self.rest_api = RestApi()
         self.measure = [
             0,  # num probe
             0,  # temperature
@@ -94,9 +96,26 @@ class Weather(object):
                 'ligh_m': round(self.measure[4] / self.measure[0]),
             }
             self.measure = [0 for _ in self.measure]
-            api = RestApi()
-            rest = api.send_data(self.SV_ENDPOINT, None, measure_data)
-            print(f'status={rest["status"]}')
+            rest = self.rest_api.send_data(self.SV_ENDPOINT, None, measure_data)
+            # print(f'status={rest["status"]}')
+
+    def event(self):
+        if self.cfg_status:
+            if self.chk_sns > 0:
+                tms = datetime.now()
+                if self.tms.second != tms.second:
+                    if (self.chk_sns == 60 and tms.minute != self.tms.minute) or tms.second % self.chk_sns == 0:
+                        print(f'-----> pomiar {tms}')
+                        self.get_measure()
+                    if self.sv_sns > 0:
+                        if (self.chk_sns == 60 and tms.hour != self.tms.hour) or (
+                                self.tms.minute != tms.minute and tms.minute % self.sv_sns == 0):
+                            print(f'----------> zapis {tms}')
+                            self.tms = tms
+                            self.save_measure()
+                            return True
+                    self.tms = tms
+        return False
 
 
 if __name__ == '__main__':
