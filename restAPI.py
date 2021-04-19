@@ -81,6 +81,6 @@ class RestApi(object):
                               rest_url,
                               headers={'Content-Type': 'application/json'},
                               body=encoded_data)
-            return {'status': rqst.status, 'data': json.load(rqst.data.decode('utf-8'))}
+            return {'status': rqst.status, 'data': json.loads(rqst.data.decode('utf-8'))}
         else:
             return None
