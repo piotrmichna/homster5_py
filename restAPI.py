@@ -67,7 +67,7 @@ class RestApi(object):
         pm = PoolManager()
         rqst = pm.request('GET', rest_url)
         if rqst.status == 200:
-            return {'status': rqst.status, 'data': json.load(rqst.data.decode('utf-8'))}
+            return {'status': rqst.status, 'data': json.loads(rqst.data.decode('utf-8'))}
         else:
             return {'status': rqst.status}
 
