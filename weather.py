@@ -85,12 +85,6 @@ class Weather(object):
 
     def save_measure(self):
         if self.cfg_status:
-            self.measure[1] = round(self.measure[1] / self.measure[0], 1)
-            self.measure[2] = round(self.measure[2] / self.measure[0])
-            self.measure[3] = round(self.measure[3] / self.measure[0], 1)
-            self.measure[4] = round(self.measure[4] / self.measure[0])
-            print(
-                f"t={self.measure[1]}, p={self.measure[2]}, h={self.measure[3]}, l={self.measure[4]}")
             time_probe = datetime.now()
             measure_data = {
                 'time_m': f'{time_probe}',
