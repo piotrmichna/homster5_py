@@ -100,4 +100,7 @@ class Max44009(object):
         print(f'Jasność światła={self.luminance}lx')
 
 
-        return {'l': luminance}
+if __name__ == '__main__':
+    lx = Max44009()
+    lx.read_luminance()
+    lx.print_luminance()
