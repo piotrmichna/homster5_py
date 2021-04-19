@@ -92,8 +92,6 @@ class Weather(object):
             print(
                 f"t={self.measure[1]}, p={self.measure[2]}, h={self.measure[3]}, l={self.measure[4]}")
             time_probe = datetime.now()
-            time_probe.second = 0
-            time_probe.microsecond = 0
             measure_data = {
                 'time_m': f'{time_probe}',
                 'temp_m': round(self.measure[1] / self.measure[0], 1),
