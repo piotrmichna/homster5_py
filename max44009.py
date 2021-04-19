@@ -52,8 +52,19 @@ MAX44009_REG_CONFIG_INTRTIMER_12_5 = 0x06
 MAX44009_REG_CONFIG_INTRTIMER_6_25 = 0x07
 
 
-class MAX44009():
-    def __init__(self):
+class Max44009(object):
+    PORT = MAX44009_PORT
+    ADDRESS = MAX44009_DEFAULT_ADDRESS
+
+    def __init__(self, adr=None, port=None):
+        self.luminance = 0
+        self.ADDRESS = None
+        self.PORT = None
+        self.set_adres(adr, port)
+
+        self.buss = smbus2.SMBus(self.PORT)
+        self.CONFIG = (MAX44009_REG_CONFIG_CONTMODE_CONTIN | MAX44009_REG_CONFIG_MANUAL_MODEON |
+                       MAX44009_REG_CONFIG_CDR_NODIVIDED | MAX44009_REG_CONFIG_INTRTIMER_800)
         self.write_config()
 
     def set_adres(self, adr=None, port=None):
