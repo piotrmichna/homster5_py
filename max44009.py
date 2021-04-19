@@ -102,5 +102,5 @@ class Max44009(object):
 
 if __name__ == '__main__':
     lx = Max44009()
-    lx.read_luminance()
+    lx.get_luminance()
     lx.print_luminance()
