@@ -1,4 +1,5 @@
 from datetime import datetime
+from time import sleep
 
 from max44009 import Max44009
 from restAPI import RestApi
@@ -72,21 +73,27 @@ class Weather(object):
     def get_rest_cfg(self):
         rest = self.rest_api.get_data(self.CFG_ENDPOINT)
         # print(f"api_url {api.get_rest_url()} status={rest['status']}")
-        if rest['status'] == 200:
-            self.cfg_status = rest['status']
-            commands = rest['data']['results']
-            for com in commands:
-                if com['name'] == 'new_sns':
-                    self.new_sns_id = check_type(com['id'])
-                else:
-                    self.__setattr__(com['name'], check_type(com["value"]))
+        while True:
+            if rest['status'] == 200:
+                self.cfg_status = rest['status']
+                commands = rest['data']['results']
+                for com in commands:
+                    if com['name'] == 'new_sns':
+                        self.new_sns_id = check_type(com['id'])
+                    else:
+                        self.__setattr__(com['name'], check_type(com["value"]))
+                break
+            else:
+                print("ERROR pobieranie konfiguracji!!")
+                print(f"api_url={self.rest_api.get_rest_url()} status={rest['status']}")
+                sleep(1)
 
     def get_measure(self):
         if self.cfg_status:
             self.measure = [x + y for x, y in zip(self.measure, self.bme.get_measure())]
             self.measure[4] += self.max4.get_luminance()
-            print(
-                f"n={self.measure[0]}, t={self.measure[1]}, p={self.measure[2]}, h={self.measure[3]}, l={self.measure[4]}")
+            m = f"n={self.measure[0]}, t={self.measure[1]}, p={self.measure[2]}, h={self.measure[3]}, l={self.measure[4]}"
+            print(m)
 
     def save_measure(self):
         if self.cfg_status:
@@ -100,6 +107,11 @@ class Weather(object):
             }
             self.measure = [0 for _ in self.measure]
             rest = self.rest_api.send_data(self.SV_ENDPOINT, None, measure_data)
+            while rest['status'] != 201:
+                print(f'błąd zapisu pomiarów, ponowienie za 1s')
+                print(f"api_url={self.rest_api.get_rest_url()} status={rest['status']}")
+                sleep(1)
+                rest = self.rest_api.send_data(self.SV_ENDPOINT, None, measure_data)
             # print(f'status={rest["status"]}')
 
     def event(self):
@@ -117,7 +129,6 @@ class Weather(object):
                             self.tms = tms
                             self.save_measure()
                             endpoint = f'{self.CFG_ENDPOINT}{self.new_sns_id}/'
-                            print(f'put_endpoint={endpoint}')
                             rest = self.rest_api.send_data(endpoint, None,
                                                            {'value': 'True'}, 'PATCH')
                             print(f'put_status={rest["status"]}')
@@ -128,10 +139,6 @@ class Weather(object):
 
 if __name__ == '__main__':
     weat = Weather()
-    i = 2
-    sv = False
-    while i:
-        sv = weat.event()
-        if sv:
-            i -= 1
-            print(f'--------- ZAPIS {2 - i} ----------')
+    while True:
+        weat.event()
+        sleep(0.1)
