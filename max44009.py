@@ -88,7 +88,7 @@ class Max44009(object):
     def write_config(self):
         self.buss.write_byte_data(self.ADDRESS, MAX44009_REG_CONFIG, self.CONFIG)
 
-    def read_luminance(self):
+    def get_luminance(self):
         data = self.buss.read_i2c_block_data(self.ADDRESS, MAX44009_REG_LUX_HIGH, 2)
         exponent = (data[0] & 0xF0) >> 4
         mantissa = ((data[0] & 0x0F) << 4) | (data[1] & 0x0F)
