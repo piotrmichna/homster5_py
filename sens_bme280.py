@@ -21,16 +21,13 @@ class Bme280Sensor(object):
 
     def get_measure(self):
         self.data = bme280.sample(self.buss, self.ADDRESS, self.calibration_params)
-        return {
-            'temp': round(self.data.temperature, 2),
-            'humi': round(self.data.pressure, 1),
-            'pres': round(self.data.humidity)
-        }
+        return [1, round(self.data.temperature, 2), round(self.data.pressure, 1),
+                round(self.data.humidity), 0]
 
     def get_print(self):
         print(f"    data pomiaru: {self.data.timestamp}")
         print(f'     temperatura: {round(self.data.temperature, 2)}')
-        print(f'       ciśnienie: {round(self.data.pressure)}')
+        print(f'       ciśnienie: {round(self.data.pressure)},1')
         print(f"      wilgotność: {round(self.data.humidity, 1)}")
 
 
