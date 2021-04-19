@@ -6,11 +6,9 @@
 
 import smbus2
 
-# Get I2C bus
-bus = smbus2.SMBus(1)
-
 # I2C address of the device
 MAX44009_DEFAULT_ADDRESS = 0x4A
+MAX44009_PORT = 1
 
 # MAX44009 Register Map
 MAX44009_REG_INTR_STATUS = 0x00  # Interrupt Status Register
@@ -57,6 +55,24 @@ MAX44009_REG_CONFIG_INTRTIMER_6_25 = 0x07
 class MAX44009():
     def __init__(self):
         self.write_config()
+
+    def set_adres(self, adr=None, port=None):
+        self.PORT = Max44009.PORT
+        self.ADDRESS = Max44009.ADDRESS
+        if adr:
+            if '0x' in adr and len(adr) == 4:
+                self.ADDRESS = adr
+
+        if port:
+            if port.isdigit():
+                try:
+                    port = int(port)
+                    if port < 10:
+                        self.PORT = port
+                    else:
+                        self.PORT = Max44009.PORT
+                except ValueError:
+                    pass
 
     def write_config(self):
         """Select the configuration register data from the given provided values"""
