@@ -17,6 +17,9 @@ class RestApi(object):
         if endpoint:
             endpoint_arr = str(endpoint).split('/')
             if len(endpoint_arr):
+                for n, v in enumerate(endpoint_arr):
+                    if str(v) == '':
+                        endpoint_arr.pop(n)
                 self.endpoint = '/'.join(endpoint_arr) + '/'
             else:
                 self.endpoint = None
@@ -34,10 +37,10 @@ class RestApi(object):
                         ht = 'http://'
                     else:
                         ht = 'https://'
+                    url_arr.pop(0)
                     for n, val in enumerate(url_arr):
                         if str(val) == '':
                             url_arr.pop(n)
-                    url_arr.pop(0)
 
                     self.api_url = ht + '/'.join(url_arr) + '/'
                 else:
@@ -64,9 +67,9 @@ class RestApi(object):
         pm = PoolManager()
         rqst = pm.request('GET', rest_url)
         if rqst.status == 200:
-            return [rqst.status, json.load(rqst.data.decode('utf-8'))]
+            return {'status': rqst.status, 'data': json.loads(rqst.data.decode('utf-8'))}
         else:
-            return [rqst.status]
+            return {'status': rqst.status}
 
     def send_data(self, endpoint=None, url_data=None, send_data=None, method='POST'):
         if type(send_data) is dict and len(send_data) and self.api_url:
@@ -78,6 +81,6 @@ class RestApi(object):
                               rest_url,
                               headers={'Content-Type': 'application/json'},
                               body=encoded_data)
-            return [rqst.status, json.load(rqst.data.decode('utf-8'))]
+            return {'status': rqst.status, 'data': json.loads(rqst.data.decode('utf-8'))}
         else:
             return None
