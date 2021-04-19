@@ -17,6 +17,9 @@ class RestApi(object):
         if endpoint:
             endpoint_arr = str(endpoint).split('/')
             if len(endpoint_arr):
+                for n, v in enumerate(endpoint_arr):
+                    if str(v) == '':
+                        endpoint_arr.pop(n)
                 self.endpoint = '/'.join(endpoint_arr) + '/'
             else:
                 self.endpoint = None
@@ -34,10 +37,10 @@ class RestApi(object):
                         ht = 'http://'
                     else:
                         ht = 'https://'
+                    url_arr.pop(0)
                     for n, val in enumerate(url_arr):
                         if str(val) == '':
                             url_arr.pop(n)
-                    url_arr.pop(0)
 
                     self.api_url = ht + '/'.join(url_arr) + '/'
                 else:
