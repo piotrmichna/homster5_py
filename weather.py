@@ -116,6 +116,11 @@ class Weather(object):
                             print(f'----------> zapis {tms}')
                             self.tms = tms
                             self.save_measure()
+                            endpoint = f'{self.CFG_ENDPOINT}{self.new_sns_id}/'
+                            print(f'put_endpoint={endpoint}')
+                            rest = self.rest_api.send_data(endpoint, None,
+                                                           {'value': 'True'}, 'PATCH')
+                            print(f'put_status={rest["status"]}')
                             return True
                     self.tms = tms
         return False
