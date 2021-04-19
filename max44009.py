@@ -86,20 +86,18 @@ class Max44009(object):
                     pass
 
     def write_config(self):
-        """Select the configuration register data from the given provided values"""
-        CONFIG = (MAX44009_REG_CONFIG_CONTMODE_CONTIN | MAX44009_REG_CONFIG_MANUAL_MODEON |
-                  MAX44009_REG_CONFIG_CDR_NODIVIDED | MAX44009_REG_CONFIG_INTRTIMER_800)
-        bus.write_byte_data(MAX44009_DEFAULT_ADDRESS,
-                            MAX44009_REG_CONFIG, CONFIG)
+        self.buss.write_byte_data(self.ADDRESS, MAX44009_REG_CONFIG, self.CONFIG)
 
-    def read_lumninance(self):
-        """Read data back from MAX44009_REG_LUX_HIGH(0x03), 2 bytes, luminance MSB, luminance LSB"""
-        data = bus.read_i2c_block_data(
-            MAX44009_DEFAULT_ADDRESS, MAX44009_REG_LUX_HIGH, 2)
-
-        # Convert the data to lux
+    def read_luminance(self):
+        data = self.buss.read_i2c_block_data(self.ADDRESS, MAX44009_REG_LUX_HIGH, 2)
         exponent = (data[0] & 0xF0) >> 4
         mantissa = ((data[0] & 0x0F) << 4) | (data[1] & 0x0F)
-        luminance = ((2 ** exponent) * mantissa) * 0.045
+        self.luminance = ((2 ** exponent) * mantissa) * 0.045
+
+        return self.luminance
+
+    def print_luminance(self):
+        print(f'Jasność światła={self.luminance}lx')
+
 
         return {'l': luminance}
