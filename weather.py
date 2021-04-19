@@ -66,18 +66,20 @@ class Weather(object):
             self.bmd = Bme280Sensor()
             self.max4 = Max44009()
         else:
-            self.cfg_status = True
+            self.cfg_status = False
             print('Błąd połączenia przy pobieraniu konfiguracji modułu Pogody')
 
     def get_rest_cfg(self):
-        api = RestApi()
-        rest = api.get_data(self.CFG_ENDPOINT)
-        print(f"api_url {api.get_rest_url()} status={rest['status']}")
+        rest = self.rest_api.get_data(self.CFG_ENDPOINT)
+        # print(f"api_url {api.get_rest_url()} status={rest['status']}")
         if rest['status'] == 200:
             self.cfg_status = rest['status']
             commands = rest['data']['results']
             for com in commands:
-                self.__setattr__(com['name'], check_type(com["value"]))
+                if com['name'] == 'new_sns':
+                    self.new_sns_id = check_type(com['id'])
+                else:
+                    self.__setattr__(com['name'], check_type(com["value"]))
 
     def get_measure(self):
         if self.cfg_status:
