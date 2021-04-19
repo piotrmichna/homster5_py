@@ -31,11 +31,14 @@ def check_type(val_in):
 
 
 class Weather(object):
+    CFG_ENDPOINT = 'cfg/weather/'
+
     def __init__(self):
         self.chk_sns = None  # int [s]
         self.sv_sns = None  # int [min]
         self.week_sns = False  # boolean
         self.long_sns = False  # boolean
+        self.CFG_ENDPOINT = Weather.CFG_ENDPOINT
         self.measure = {
             'num': 0,
             'temp': 0,
@@ -47,7 +50,7 @@ class Weather(object):
 
     def get_rest_cfg(self):
         api = RestApi()
-        rest = api.get_data('cfg/weather/')
+        rest = api.get_data(self.CFG_ENDPOINT)
         print(f"api_url {api.get_rest_url()} status={rest['status']}")
         if rest['status'] == 200:
             commands = rest['data']['results']
