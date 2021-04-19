@@ -45,15 +45,14 @@ class Weather(object):
         }
         self.get_rest_cfg()
 
-    def get_cfg(self):
+    def get_rest_cfg(self):
         api = RestApi()
         rest = api.get_data('cfg/weather/')
-        print(f"odpowiedź {rest['status']}")
-        print(f"api_url {api.get_rest_url()}")
+        print(f"api_url {api.get_rest_url()} status={rest['status']}")
         if rest['status'] == 200:
             commands = rest['data']['results']
             for com in commands:
-                print(f'command:{com["name"]}={com["value"]}')
+                self.__setattr__(com['name'], check_type(com["value"]))
 
 
 if __name__ == '__main__':
