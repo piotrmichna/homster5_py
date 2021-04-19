@@ -1,4 +1,5 @@
 from datetime import datetime
+from time import sleep
 
 from max44009 import Max44009
 from restAPI import RestApi
@@ -79,6 +80,8 @@ class Weather(object):
         if self.cfg_status:
             self.measure = [x + y for x, y in zip(self.measure, self.bme.get_measure())]
             self.measure[4] += self.max4.get_luminance()
+            print(
+                f"n={self.measure[0]}, t={self.measure[1]}, p={self.measure[2]}, h={self.measure[3]}, l={self.measure[4]}")
 
     def save_measure(self):
         if self.cfg_status:
@@ -86,6 +89,8 @@ class Weather(object):
             self.measure[2] = round(self.measure[2] / self.measure[0])
             self.measure[3] = round(self.measure[3] / self.measure[0], 1)
             self.measure[4] = round(self.measure[4] / self.measure[0])
+            print(
+                f"t={self.measure[1]}, p={self.measure[2]}, h={self.measure[3]}, l={self.measure[4]}")
             time_probe = datetime.now()
             time_probe.second = 0
             time_probe.microsecond = 0
@@ -99,8 +104,19 @@ class Weather(object):
             self.measure = [0 for _ in self.measure]
             api = RestApi()
             rest = api.send_data(self.SV_ENDPOINT, None, measure_data)
+            print(f'status={rest["status"]}')
 
 
 if __name__ == '__main__':
     weat = Weather()
     weat.get_rest_cfg()
+    i = 2
+    while i:
+        i -= 1
+        print(f'--------- POMIAR {2 - i} ----------')
+        n = 10
+        while n:
+            weat.get_measure()
+            n -= 1
+            sleep(1)
+        weat.save_measure()
