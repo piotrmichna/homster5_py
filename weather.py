@@ -68,9 +68,15 @@ class Weather(object):
         rest = api.get_data(self.CFG_ENDPOINT)
         print(f"api_url {api.get_rest_url()} status={rest['status']}")
         if rest['status'] == 200:
+            self.cfg_status = rest['status']
             commands = rest['data']['results']
             for com in commands:
                 self.__setattr__(com['name'], check_type(com["value"]))
+
+    def get_measure(self):
+        if self.cfg_status:
+            self.measure = [x + y for x, y in zip(self.measure, self.bme.get_measure())]
+            self.measure[4] += self.max4.get_luminance()
 
 
 if __name__ == '__main__':
