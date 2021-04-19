@@ -1,0 +1,15 @@
+[Unit]
+Description="Homster Wather Sensors"
+After=network-online.target
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/homster5_shpy
+VIRTUAL_ENV=/home/pi/homster5_shpy/venv
+Environment=PATH=$VIRTUAL_ENV/bin:$PATH
+ExecStart=/home/pi/homster5_shpy/venv/bin/python weather.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
