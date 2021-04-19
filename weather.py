@@ -1,8 +1,10 @@
+from max44009 import Max44009
 from restAPI import RestApi
+from sens_bme280 import Bme280Sensor
 
 
 def check_type(val_in):
-    if val_in == 'None':
+    if str(val_in) == 'None':
         return None
     if val_in == 'True' or val_in == 'False':
         if val_in == 'True':
@@ -32,6 +34,7 @@ def check_type(val_in):
 
 class Weather(object):
     CFG_ENDPOINT = 'cfg/weather/'
+    SV_ENDPOINT = 'weather/daily/'
 
     def __init__(self):
         self.chk_sns = None  # int [s]
@@ -39,14 +42,26 @@ class Weather(object):
         self.week_sns = False  # boolean
         self.long_sns = False  # boolean
         self.CFG_ENDPOINT = Weather.CFG_ENDPOINT
-        self.measure = {
-            'num': 0,
-            'temp': 0,
-            'humi': 0,
-            'pres': 0,
-            'ligh': 0,
-        }
+        self.SV_ENDPOINT = Weather.SV_ENDPOINT
+        self.cfg_status = None
+        self.bme = Bme280Sensor()
+        self.max4 = Max44009()
+        self.measure = [
+            0,  # num probe
+            0,  # temperature
+            0,  # pressure
+            0,  # humidity
+            0,  # luminance
+        ]
         self.get_rest_cfg()
+        if self.cfg_status == 200:
+            print('Start modułu Pogody')
+            self.cfg_status = True
+            self.bmd = Bme280Sensor()
+            self.max4 = Max44009()
+        else:
+            self.cfg_status = True
+            print('Błąd połączenia przy pobieraniu konfiguracji modułu Pogody')
 
     def get_rest_cfg(self):
         api = RestApi()
@@ -60,4 +75,4 @@ class Weather(object):
 
 if __name__ == '__main__':
     weat = Weather()
-    weat.get_cfg()
+    weat.get_rest_cfg()
