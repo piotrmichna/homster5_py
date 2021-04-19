@@ -32,8 +32,18 @@ def check_type(val_in):
 
 class Weather(object):
     def __init__(self):
-        self.chk_sns = 0
-        self.sv_sns = 0
+        self.chk_sns = None  # int [s]
+        self.sv_sns = None  # int [min]
+        self.week_sns = False  # boolean
+        self.long_sns = False  # boolean
+        self.measure = {
+            'num': 0,
+            'temp': 0,
+            'humi': 0,
+            'pres': 0,
+            'ligh': 0,
+        }
+        self.get_rest_cfg()
 
     def get_cfg(self):
         api = RestApi()
