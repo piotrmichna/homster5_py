@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from max44009 import Max44009
 from restAPI import RestApi
 from sens_bme280 import Bme280Sensor
@@ -77,6 +79,26 @@ class Weather(object):
         if self.cfg_status:
             self.measure = [x + y for x, y in zip(self.measure, self.bme.get_measure())]
             self.measure[4] += self.max4.get_luminance()
+
+    def save_measure(self):
+        if self.cfg_status:
+            self.measure[1] = round(self.measure[1] / self.measure[0], 1)
+            self.measure[2] = round(self.measure[2] / self.measure[0])
+            self.measure[3] = round(self.measure[3] / self.measure[0], 1)
+            self.measure[4] = round(self.measure[4] / self.measure[0])
+            time_probe = datetime.now()
+            time_probe.second = 0
+            time_probe.microsecond = 0
+            measure_data = {
+                'time_m': f'{time_probe}',
+                'temp_m': round(self.measure[1] / self.measure[0], 1),
+                'pres_m': round(self.measure[2] / self.measure[0]),
+                'humi_m': round(self.measure[3] / self.measure[0], 1),
+                'ligh_m': round(self.measure[4] / self.measure[0]),
+            }
+            self.measure = [0 for _ in self.measure]
+            api = RestApi()
+            rest = api.send_data(self.SV_ENDPOINT, None, measure_data)
 
 
 if __name__ == '__main__':
