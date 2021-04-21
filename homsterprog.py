@@ -1,8 +1,11 @@
 import RPi.GPIO as GPIO
 
+from restAPI import RestApi
+
 
 class ProgGpio(object):
     COUNTER = 0
+    SV_ENDPOINT = 'cfg/gpio_pin/'
 
     def __init__(self, data: dict):
         # ------- property hardware ----------
@@ -23,7 +26,13 @@ class ProgGpio(object):
         self.ob_state = None
         self._started = False
 
+        # ---- set class property from rest data ----
         self.get_rest_cfg(data)
+
+        if self.pin_cfg:
+            self.SV_ENDPOINT = ProgGpio.SV_ENDPOINT + f'{self.pin_cfg}/'
+            self.rest_api = RestApi()
+
         if ProgGpio.COUNTER == 0:
             GPIO.setmode(GPIO.BOARD)
             GPIO.setwarnings(False)
