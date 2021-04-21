@@ -59,6 +59,10 @@ class ProgGpio(object):
             else:
                 GPIO.setup(self.pin_board, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+    def send_rest_gpio(self, val):
+        rest = self.rest_api.send_data(self.SV_ENDPOINT, None, {'val': val}, 'PATCH')
+        print(f"rest_status={rest['status']}")
+
     def __del__(self):
         ProgGpio.COUNTER -= 1
 
