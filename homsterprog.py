@@ -1,4 +1,5 @@
 class ProgGpio(object):
+    COUNTER = 0
 
     def __init__(self, data: dict):
         # ------- property hardware ----------
@@ -21,12 +22,17 @@ class ProgGpio(object):
 
         self.get_rest_cfg(data)
 
+        ProgGpio.COUNTER += 1
+
     def get_rest_cfg(self, data: dict):
         for key, val in data.items():
             if key == 'val':
                 self.ob_state = val
             else:
                 self.__setattr__(key, val)
+
+    def __del__(self):
+        ProgGpio.COUNTER -= 1
 
 
 if __name__ == '__main__':
