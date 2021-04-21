@@ -25,37 +25,32 @@ class ProgGpio(object):
         self.ob_duration_elspet = 0
         self.ob_state = None
         self._started = False
-
-        # ---- set class property from rest data ----
-        self.get_rest_cfg(data)
-
-        if self.pin_cfg:
-            self.SV_ENDPOINT = ProgGpio.SV_ENDPOINT + f'{self.pin_cfg}/'
-            self.rest_api = RestApi()
-
+        self.rest_api = RestApi()
         if ProgGpio.COUNTER == 0:
             GPIO.setmode(GPIO.BOARD)
             GPIO.setwarnings(False)
 
         ProgGpio.COUNTER += 1
 
+        # ---- set class property from rest data ----
+        self.get_rest_cfg(data)
+
     def get_rest_cfg(self, data: dict):
         for key, val in data.items():
-            if key == 'val':
-                self.ob_state = val
-            else:
-                self.__setattr__(key, val)
+            self.__setattr__(key, val)
 
         # GPIO Board pin initialization
+        if self.pin_cfg:
+            self.SV_ENDPOINT = ProgGpio.SV_ENDPOINT + f'{self.pin_cfg}/'
+
         if self.dir_out:  # OUT
             GPIO.setup(self.pin_board, GPIO.OUT)
             if self.val_default:
                 GPIO.output(self.pin_board, GPIO.LOW)
             else:
                 GPIO.output(self.pin_board, GPIO.HIGH)
-
             if self.val == self.val_default:
-                if self.val:
+                if self.val == 1:
                     self.send_rest_gpio(0)
                     self.val = 0
                 else:
@@ -69,7 +64,6 @@ class ProgGpio(object):
 
     def send_rest_gpio(self, val):
         rest = self.rest_api.send_data(self.SV_ENDPOINT, None, {'val': val}, 'PATCH')
-        print(f"rest_status={rest['status']}")
 
     def __del__(self):
         ProgGpio.COUNTER -= 1
@@ -136,3 +130,7 @@ if __name__ == '__main__':
             for mod in pr.gpio_modules:
                 print(f'---> gpio={mod.name}, start={mod.pin_board}')
             print(pr)
+    print(f'liczba gpio={ProgGpio.COUNTER}')
+    prog[0].gpio_modules.pop(5)
+    print('usuniecie gpio[5]')
+    print(f'liczba gpio={ProgGpio.COUNTER}')
