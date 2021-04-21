@@ -111,6 +111,9 @@ class ProgX(object):
             else:
                 self.__setattr__(key, val)
 
+    def __str__(self):
+        return f'{self.name}, start_times({len(self.start_times)}), gpio_module({len(self.gpio_modules)})'
+
 
 if __name__ == '__main__':
     ra = RestApi()
