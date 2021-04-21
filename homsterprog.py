@@ -1,3 +1,6 @@
+import RPi.GPIO as GPIO
+
+
 class ProgGpio(object):
     COUNTER = 0
 
@@ -21,6 +24,9 @@ class ProgGpio(object):
         self._started = False
 
         self.get_rest_cfg(data)
+        if ProgGpio.COUNTER == 0:
+            GPIO.setmode(GPIO.BOARD)
+            GPIO.setwarnings(False)
 
         ProgGpio.COUNTER += 1
 
