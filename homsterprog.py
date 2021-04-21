@@ -74,6 +74,20 @@ class ProgGpio(object):
     def __del__(self):
         ProgGpio.COUNTER -= 1
 
+class ProgStartTime(object):
+    def __init__(self, data: dict):
+        self.id = None
+        self.name = None
+        self.description = None
+        self.day_delay = None
+        self.start_time = None
+        self.active = None
+        self.prog = None
+        self.get_rest_cfg(data)
+
+    def get_rest_cfg(self, data: dict):
+        for key, val in data.items():
+            self.__setattr__(key, val)
 
 if __name__ == '__main__':
     pass
