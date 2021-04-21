@@ -113,4 +113,23 @@ class ProgX(object):
 
 
 if __name__ == '__main__':
-    pass
+    ra = RestApi()
+    rest = ra.get_data('cfg/prog_name/')
+    print(f'data.status={rest["status"]}')
+    commands = rest['data']['results']
+    prog = []
+    mods = rest['data']['results']
+    for mod in mods:
+        prog.append(ProgX(mod))
+
+    print(f'ilosc programow={len(prog)}')
+    for n, pr in enumerate(prog):
+        print(f'program{n}={pr.name}')
+        if pr.id:
+            print(f'ilość startów programu={len(pr.start_times)}')
+            for st in pr.start_times:
+                print(f'---> name={st.name}, start={st.start_time}')
+            print(f'ilość gpio programu={len(pr.gpio_modules)}')
+            for mod in pr.gpio_modules:
+                print(f'---> gpio={mod.name}, start={mod.pin_board}')
+            print(pr)
