@@ -1,5 +1,6 @@
 class ProgGpio(object):
-    def __init__(self):
+
+    def __init__(self, data: dict):
         # ------- property hardware ----------
         self.id = None  # id module
         self.prog = None  # id module
@@ -17,6 +18,15 @@ class ProgGpio(object):
         self.ob_duration_elspet = 0
         self.ob_state = None
         self._started = False
+
+        self.get_rest_cfg(data)
+
+    def get_rest_cfg(self, data: dict):
+        for key, val in data.items():
+            if key == 'val':
+                self.ob_state = val
+            else:
+                self.__setattr__(key, val)
 
 
 if __name__ == '__main__':
