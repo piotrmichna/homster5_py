@@ -74,6 +74,7 @@ class ProgGpio(object):
     def __del__(self):
         ProgGpio.COUNTER -= 1
 
+
 class ProgStartTime(object):
     def __init__(self, data: dict):
         self.id = None
@@ -88,6 +89,28 @@ class ProgStartTime(object):
     def get_rest_cfg(self, data: dict):
         for key, val in data.items():
             self.__setattr__(key, val)
+
+
+class ProgX(object):
+    def __init__(self, data: dict):
+        self.id = None
+        self.name = None
+        self.active = None
+        self.start_times = []
+        self.gpio_modules = []
+        self.get_rest_cfg(data)
+
+    def get_rest_cfg(self, data: dict):
+        for key, val in data.items():
+            if key == 'progpin':
+                for mod in val:
+                    self.gpio_modules.append(ProgGpio(mod))
+            elif key == 'progstarts':
+                for mod in val:
+                    self.start_times.append(ProgStartTime(mod))
+            else:
+                self.__setattr__(key, val)
+
 
 if __name__ == '__main__':
     pass
