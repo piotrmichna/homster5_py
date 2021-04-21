@@ -53,6 +53,14 @@ class ProgGpio(object):
                 GPIO.output(self.pin_board, GPIO.LOW)
             else:
                 GPIO.output(self.pin_board, GPIO.HIGH)
+
+            if self.val == self.val_default:
+                if self.val:
+                    self.send_rest_gpio(0)
+                    self.val = 0
+                else:
+                    self.send_rest_gpio(1)
+                    self.val = 1
         else:  # IN
             if self.val_default:
                 GPIO.setup(self.pin_board, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
