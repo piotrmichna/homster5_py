@@ -37,6 +37,19 @@ class ProgGpio(object):
             else:
                 self.__setattr__(key, val)
 
+        # GPIO Board pin initialization
+        if self.dir_out:  # OUT
+            GPIO.setup(self.pin_board, GPIO.OUT)
+            if self.val_default:
+                GPIO.output(self.pin_board, GPIO.LOW)
+            else:
+                GPIO.output(self.pin_board, GPIO.HIGH)
+        else:  # IN
+            if self.val_default:
+                GPIO.setup(self.pin_board, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+            else:
+                GPIO.setup(self.pin_board, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
     def __del__(self):
         ProgGpio.COUNTER -= 1
 
