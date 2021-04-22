@@ -4,8 +4,9 @@ class SyncCommand(object):
         self.idc = idc
         self.value = value
         self.prefix = ""
-        self.endpoint = endpoint
+        self.endpoint = ""
         self.set_prefix()
+        self.parse_endpoint(endpoint)
 
     def set_prefix(self):
         if type(self.command) == str and len(self.command):
@@ -18,3 +19,13 @@ class SyncCommand(object):
             return True
         else:
             False
+
+    def parse_endpoint(self, endpoint: str):
+        ep_ar = endpoint.split('/')
+        for i, s in enumerate(ep_ar):
+            if s == "":
+                ep_ar.pop(i)
+        if len(ep_ar):
+            self.endpoint = '/'.join(ep_ar) + '/' + self.idc + '/'
+        else:
+            self.endpoint = self.idc + '/'
