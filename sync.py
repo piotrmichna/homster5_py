@@ -1,3 +1,8 @@
+from time import sleep
+
+from restAPI import RestApi
+
+
 class SyncCommand(object):
     ENDPOINT = 'sync/'
 
@@ -9,14 +14,14 @@ class SyncCommand(object):
             self.idc = 0
         self.value = ""
         self.prefix = ""
+        self.endpoint = ""
         if endpoint:
-            self.endpoint = str(endpoint)
+            self.parse_endpoint(endpoint)
         else:
-            self.endpoint = SyncCommand.ENDPOINT
+            self.parse_endpoint(SyncCommand.ENDPOINT)
 
         self.set_value(value)
         self.set_prefix()
-        self.parse_endpoint(endpoint)
 
     def set_prefix(self):
         if type(self.command) == str and len(self.command):
@@ -80,7 +85,39 @@ class Sync(object):
         self.command_in = []
         self.command_out = []
         self.sync_delay = 1
+        self.rest_api = RestApi()
         if endpoint:
             self.endpoint = str(endpoint)
         else:
             self.endpoint = Sync.ENDPOINT
+        self.get_rest_status()
+        self.check_status()
+
+    def get_rest_status(self):
+        rest = self.rest_api.get_data(self.endpoint)
+        print(f"api_url={self.rest_api.get_rest_url()} status={rest['status']}")
+        while True:
+            if rest['status'] == 200:
+                commands = rest['data']['results']
+                tmp = []
+                for com in commands:
+                    tmp.append(SyncCommand(com['id'], com['name'], com['value']))
+                    if len(self.command_out) < len(tmp):
+                        self.command_out.append(SyncCommand(com['id'], com['name'], com['value']))
+
+                self.command_in = tmp
+                while len(self.command_out) > len(self.command_in):
+                    self.command_out.pop(-1)
+                break
+            else:
+                print("ERROR pobieranie stausu!!")
+                print(f"api_url={self.rest_api.get_rest_url()} status={rest['status']}")
+                sleep(0.1)
+
+    def check_status(self):
+        for idx in range(len(self.command_in)):
+            print(self.command_in[idx])
+
+
+if __name__ == '__main__':
+    snc = Sync()
