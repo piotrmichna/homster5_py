@@ -1,4 +1,6 @@
 class SyncCommand(object):
+    ENDPOINT = 'sync/'
+
     def __init__(self, idc, command, value=None, endpoint=None):
         self.command = command
         if type(idc) == int:
@@ -7,7 +9,11 @@ class SyncCommand(object):
             self.idc = 0
         self.value = ""
         self.prefix = ""
-        self.endpoint = ""
+        if endpoint:
+            self.endpoint = str(endpoint)
+        else:
+            self.endpoint = SyncCommand.ENDPOINT
+
         self.set_value(value)
         self.set_prefix()
         self.parse_endpoint(endpoint)
