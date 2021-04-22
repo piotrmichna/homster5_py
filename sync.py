@@ -71,3 +71,16 @@ class SyncCommand(object):
         ret_str = f"<'endpoint':{self.endpoint}, 'command':{self.command}, "
         ret_str += f"'prefix':{self.prefix}, 'value': {self.value}>"
         return ret_str
+
+
+class Sync(object):
+    ENDPOINT = 'sync/'
+
+    def __init__(self, endpoint=None):
+        self.command_in = []
+        self.command_out = []
+        self.sync_delay = 1
+        if endpoint:
+            self.endpoint = str(endpoint)
+        else:
+            self.endpoint = Sync.ENDPOINT
