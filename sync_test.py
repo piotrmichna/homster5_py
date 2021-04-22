@@ -54,3 +54,19 @@ def test_sync_parse_endpoint(sync, idx, ep, expected):
     sync.idc = idx
     sync.parse_endpoint(ep)
     assert sync.endpoint == expected
+
+
+@pytest.mark.parametrize('val, expected', (
+        (33, 'True'),
+        (True, 'True'),
+        ('true', 'True'),
+        ('T', 'True'),
+        ('', 'False'),
+        ('Dupa', 'False'),
+        (0, 'False'),
+        (False, 'False'),
+        (None, 'False'),
+))
+def test_sync_set_value(sync, val, expected):
+    sync.set_value(val)
+    assert sync.value == expected

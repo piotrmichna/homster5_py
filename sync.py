@@ -56,10 +56,10 @@ class SyncCommand(object):
         return {'endpoint': self.endpoint, 'data': {'value': self.value}}
 
     def set_value(self, value):
-        if value:
-            self.value = str(value)
+        if str(value).lower() == 'true' or str(value).lower() == 't' or (type(value) == int and value > 0):
+            self.value = 'True'
         else:
-            self.value = ""
+            self.value = "False"
 
     def __str__(self):
         ret_str = f"<'endpoint':{self.endpoint}, 'command':{self.command}, "
