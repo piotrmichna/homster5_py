@@ -29,3 +29,8 @@ class SyncCommand(object):
             self.endpoint = '/'.join(ep_ar) + '/' + self.idc + '/'
         else:
             self.endpoint = self.idc + '/'
+
+    def get_command_data(self, endpoint=None):
+        if endpoint:
+            self.parse_endpoint(endpoint)
+        return {'endpoint': self.endpoint, 'data': {'value': self.value}}
