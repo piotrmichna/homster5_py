@@ -13,3 +13,8 @@ class SyncCommand(object):
             if len(com_ar) > 1:
                 self.prefix = com_ar[0]
 
+    def check_prefix(self, prefix):
+        if self.prefix == prefix:
+            return True
+        else:
+            False
