@@ -34,3 +34,8 @@ class SyncCommand(object):
         if endpoint:
             self.parse_endpoint(endpoint)
         return {'endpoint': self.endpoint, 'data': {'value': self.value}}
+
+    def __str__(self):
+        ret_str = f"<'endpoint':{self.endpoint}, 'command':{self.command}, "
+        ret_str += f"'prefix':{self.prefix}, 'value': {self.value}>"
+        return ret_str
