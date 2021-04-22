@@ -2,9 +2,10 @@ class SyncCommand(object):
     def __init__(self, endpoint: str, command: str, idc: int, value: str):
         self.command = command
         self.idc = idc
-        self.value = value
+        self.value = ""
         self.prefix = ""
         self.endpoint = ""
+        self.set_value(value)
         self.set_prefix()
         self.parse_endpoint(endpoint)
 
@@ -34,6 +35,12 @@ class SyncCommand(object):
         if endpoint:
             self.parse_endpoint(endpoint)
         return {'endpoint': self.endpoint, 'data': {'value': self.value}}
+
+    def set_value(self, value):
+        if value:
+            self.value = str(value)
+        else:
+            self.value = ""
 
     def __str__(self):
         ret_str = f"<'endpoint':{self.endpoint}, 'command':{self.command}, "
