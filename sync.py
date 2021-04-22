@@ -5,3 +5,11 @@ class SyncCommand(object):
         self.value = value
         self.prefix = ""
         self.endpoint = endpoint
+        self.set_prefix()
+
+    def set_prefix(self):
+        if type(self.command) == str and len(self.command):
+            com_ar = self.command.split('_')
+            if len(com_ar) > 1:
+                self.prefix = com_ar[0]
+
