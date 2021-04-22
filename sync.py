@@ -30,17 +30,25 @@ class SyncCommand(object):
         if self.prefix == prefix:
             return True
         else:
-            False
+            if self.prefix == '' and not prefix:
+                return True
+            else:
+                return False
 
     def parse_endpoint(self, endpoint):
-        ep_ar = str(endpoint).split('/')
-        for i, s in enumerate(ep_ar):
-            if s == "":
-                ep_ar.pop(i)
-        if len(ep_ar):
-            self.endpoint = '/'.join(ep_ar) + '/' + str(self.idc) + '/'
-        else:
-            self.endpoint = str(self.idc) + '/'
+        self.endpoint = ''
+        if endpoint and self.idc and type(self.idc) == int:
+            ep_ar = str(endpoint).split('/')
+            while "" in ep_ar:
+                for i, s in enumerate(ep_ar):
+                    if s == "":
+                        ep_ar.pop(i)
+            if len(ep_ar):
+                self.endpoint = '/'.join(ep_ar) + '/'
+            if self.idc > 0:
+                self.endpoint += str(self.idc) + '/'
+            else:
+                self.endpoint = ''
 
     def get_command_data(self, endpoint=None):
         if endpoint:
