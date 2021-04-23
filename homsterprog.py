@@ -1,3 +1,6 @@
+from datetime import datetime
+from time import sleep
+
 import RPi.GPIO as GPIO
 
 from restAPI import RestApi
@@ -5,7 +8,7 @@ from restAPI import RestApi
 
 class ProgGpio(object):
     COUNTER = 0
-    GPIO_UPDATE = False
+    GPIO_UPDATE = True
     SV_ENDPOINT = 'cfg/gpio_pin/'
 
     def __init__(self, data: dict):
@@ -20,6 +23,7 @@ class ProgGpio(object):
         self.pin_board = None  # nr pin IO on raspberry pi board
         self.dir_out = None  # pin out
         self.val = None  # actual pin IO state
+        self.val_set = None
         self.val_default = None  # active pin IO state
 
         # ------- property object ----------
@@ -46,64 +50,111 @@ class ProgGpio(object):
 
         if self.dir_out:  # OUT
             GPIO.setup(self.pin_board, GPIO.OUT)
-            if self.val_default:
-                GPIO.output(self.pin_board, GPIO.LOW)
-            else:
-                GPIO.output(self.pin_board, GPIO.HIGH)
-            if self.val == self.val_default:
-                if self.val == 1:
-                    self.send_rest_gpio(0)
-                    self.val = 0
-                else:
-                    self.send_rest_gpio(1)
-                    self.val = 1
+            self.set_gpio_off()
         else:  # IN
             if self.val_default:
                 GPIO.setup(self.pin_board, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
             else:
                 GPIO.setup(self.pin_board, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+            if self.val != GPIO.input(self.pin_board):
+                rest = self.send_rest_gpio(GPIO.input(self.pin_board))
+                ProgGpio.GPIO_UPDATE = True
+
     def send_rest_gpio(self, val):
+        print(f'rest_gpio[{self.pin_board}]={val}')
         rest = self.rest_api.send_data(self.SV_ENDPOINT, None, {'val': val}, 'PATCH')
         return rest['status']
 
     def set_gpio_on(self):
         if self.enabled:
-            if self.val != self.val_default:
+            if GPIO.input(self.pin_board) != self.val_default:
                 GPIO.output(self.pin_board, self.val_default)
+            if self.val != self.val_default:
                 rest = self.send_rest_gpio(self.val_default)
                 ProgGpio.GPIO_UPDATE = True
 
     def set_gpio_off(self):
-        if self.enabled:
-            if self.val == self.val_default:
-                if self.val_default == 1:
-                    GPIO.output(self.pin_board, GPIO.LOW)
-                    rest = self.send_rest_gpio(0)
-                else:
-                    GPIO.output(self.pin_board, GPIO.HIGH)
-                    rest = self.send_rest_gpio(1)
+        if GPIO.input(self.pin_board) == self.val_default:
+            GPIO.output(self.pin_board, int(not bool(self.val_default)))
 
-                ProgGpio.GPIO_UPDATE = True
+        if self.val == self.val_default:
+            rest = self.send_rest_gpio(int(not bool(self.val_default)))
+            ProgGpio.GPIO_UPDATE = True
 
     def __del__(self):
         ProgGpio.COUNTER -= 1
 
 
 class ProgStartTime(object):
+    ENDPOINT = 'cfg/prog_start/'
+    UPDATE = True
+
     def __init__(self, data: dict):
         self.id = None
         self.name = None
         self.description = None
         self.day_delay = None
+        self.next_time = None
         self.start_time = None
         self.active = None
         self.prog = None
+        self.rest_api = RestApi()
+        self.SV_ENDPOINT = None
         self.get_rest_cfg(data)
 
     def get_rest_cfg(self, data: dict):
         for key, val in data.items():
-            self.__setattr__(key, val)
+            if key == 'next_time':
+                self.next_time = datetime.fromisoformat(val)
+            else:
+                self.__setattr__(key, val)
+        print(f'start[{self.name}]={self.start_time}')
+        self.SV_ENDPOINT = ProgStartTime.ENDPOINT + str(self.id) + '/'
+        self.get_start_time()
+
+    def check_next_start(self, dat):
+        if self.next_time < dat:
+            return self.next_time
+        else:
+            return dat
+
+    def get_start_time(self):
+        if self.active:
+            now = datetime.now()
+            now = now.replace(microsecond=0)
+            # print(
+            #     f'dziśiejszy start ={bool(now.timetuple().tm_yday <= self.next_start.timetuple().tm_yday)}')
+
+            tim_ar = str(self.start_time).split(':')
+            start_t = now.replace(hour=int(tim_ar[0]), minute=int(tim_ar[1]), second=int(tim_ar[2]), microsecond=0)
+            # start_t5 = now.replace(hour=int(tim_ar[0]), minute=int(tim_ar[1]), second=int(tim_ar[2]) + 5,
+            #                        microsecond=0)
+            # if (now >= start_t) and (now <= start_t5):
+            #     print(f'Pora na start: {self.name}')
+            # elif now < start_t:
+            #     print(f'....Oczekiwanie na start: {self.name}')
+            # else:
+            #     print(f'....Za późno na start: {self.name}')
+            # print(f'{start_t.isoformat()}={self.next_time}')
+            if start_t != self.next_time:
+                while True:
+                    rest = self.rest_set_next_start(start_t)
+                    if rest['status'] == 200:
+                        self.next_time = start_t
+                        break
+                    else:
+                        sleep(0.1)
+
+            # elsped = start_t - now
+            # print(f'start_za={elsped}')
+            # print(f'dzień_roku={now.timetuple().tm_yday}')
+
+    def rest_set_next_start(self, val):
+        print(f'rest_next_start[{self.name}]={val}')
+        rest = self.rest_api.send_data(self.SV_ENDPOINT, None, {'next_time': str(val)}, 'PATCH')
+        print(f"rest status ---> {rest['status']}")
+        return rest
 
 
 class ProgX(object):
@@ -111,6 +162,8 @@ class ProgX(object):
         self.id = None
         self.name = None
         self.active = None
+        self.running = None
+        self.stop_run = False
         self.start_times = []
         self.gpio_modules = []
         self.get_rest_cfg(data)
@@ -132,15 +185,19 @@ class ProgX(object):
 
 if __name__ == '__main__':
     ra = RestApi()
-    rest = ra.get_data('cfg/prog_name/')
-    print(f'data.status={rest["status"]}')
-    commands = rest['data']['results']
-    prog = []
-    mods = rest['data']['results']
-    for mod in mods:
-        prog.append(ProgX(mod))
+    ProgGpio.GPIO_UPDATE = True
+    while ProgGpio.GPIO_UPDATE:
+        prog = []
+        ProgGpio.GPIO_UPDATE = False
+        rest = ra.get_data('cfg/prog_name/')
+        print(f'----> data.status={rest["status"]}')
+        commands = rest['data']['results']
 
-    print(f'ilosc programow={len(prog)}')
+        mods = rest['data']['results']
+        for mod in mods:
+            prog.append(ProgX(mod))
+
+        print(f'ilosc programow={len(prog)}')
     for n, pr in enumerate(prog):
         print(f'program{n}={pr.name}')
         if pr.id:
@@ -152,6 +209,5 @@ if __name__ == '__main__':
                 print(f'---> gpio={mod.name}, start={mod.pin_board}')
             print(pr)
     print(f'liczba gpio={ProgGpio.COUNTER}')
-    prog[0].gpio_modules.pop(5)
-    print('usuniecie gpio[5]')
+
     print(f'liczba gpio={ProgGpio.COUNTER}')

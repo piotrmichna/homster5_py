@@ -65,7 +65,7 @@ def test_sync_parse_endpoint(sync, idx, ep, expected):
         ('Dupa', 'False'),
         (0, 'False'),
         (False, 'False'),
-        (None, 'False'),
+(None, 'False'),
 ))
 def test_sync_set_value(sync, val, expected):
     sync.set_value(val)

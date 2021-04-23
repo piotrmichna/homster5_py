@@ -103,7 +103,7 @@ class Sync(object):
                 for com in commands:
                     tmp.append(SyncCommand(com['id'], com['name'], com['value']))
                     if len(self.command_out) < len(tmp):
-                        self.command_out.append(SyncCommand(com['id'], com['name'], com['value']))
+                        self.command_out.append(SyncCommand(com['id'], com['name'], 'False'))
 
                 self.command_in = tmp
                 while len(self.command_out) > len(self.command_in):
@@ -116,7 +116,7 @@ class Sync(object):
 
     def check_status(self):
         for idx in range(len(self.command_in)):
-            print(self.command_in[idx])
+            print(f'command{self.command_in[idx].command}: in={self.command_in[idx].value} out=in={self.command_out[idx].value}')
 
 
 if __name__ == '__main__':
