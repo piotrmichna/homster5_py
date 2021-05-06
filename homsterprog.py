@@ -5,6 +5,7 @@ from restAPI import RestApi
 
 class ProgGpio(object):
     COUNTER = 0
+    GPIO_UPDATE = False
     SV_ENDPOINT = 'cfg/gpio_pin/'
 
     def __init__(self, data: dict):
@@ -64,6 +65,26 @@ class ProgGpio(object):
 
     def send_rest_gpio(self, val):
         rest = self.rest_api.send_data(self.SV_ENDPOINT, None, {'val': val}, 'PATCH')
+        return rest['status']
+
+    def set_gpio_on(self):
+        if self.enabled:
+            if self.val != self.val_default:
+                GPIO.output(self.pin_board, self.val_default)
+                rest = self.send_rest_gpio(self.val_default)
+                ProgGpio.GPIO_UPDATE = True
+
+    def set_gpio_off(self):
+        if self.enabled:
+            if self.val == self.val_default:
+                if self.val_default == 1:
+                    GPIO.output(self.pin_board, GPIO.LOW)
+                    rest = self.send_rest_gpio(0)
+                else:
+                    GPIO.output(self.pin_board, GPIO.HIGH)
+                    rest = self.send_rest_gpio(1)
+
+                ProgGpio.GPIO_UPDATE = True
 
     def __del__(self):
         ProgGpio.COUNTER -= 1
