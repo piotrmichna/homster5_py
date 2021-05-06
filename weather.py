@@ -91,7 +91,7 @@ class Weather(object):
     def get_measure(self):
         if self.cfg_status:
             self.measure = [x + y for x, y in zip(self.measure, self.bme.get_measure())]
-            self.measure[4] += self.max4.get_luminance()
+            self.measure[4] += round(self.max4.get_luminance(), 0)
             m = f"n={self.measure[0]}, t={self.measure[1]}, p={self.measure[2]},"
             m += f"h={self.measure[3]}, l={self.measure[4]}"
             print(m)
