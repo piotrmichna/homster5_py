@@ -97,7 +97,7 @@ class Weather(object):
             m += f"{round(self.measure[2] / self.measure[0], 1)};"
             m += f"{round(self.measure[3] / self.measure[0], 1)};"
             m += f"{round(self.measure[4] / self.measure[0], 1)};"
-            filename = datetime.now().date()
+            filename = datetime.now().strftime("%Y-%m-%d")
 
             os.system(f'echo "{m}" >> {filename}.txt')
             os.system(f'echo "{m}"')
