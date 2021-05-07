@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from time import sleep
 
@@ -93,11 +92,11 @@ class Weather(object):
         if self.cfg_status:
             self.measure = [x + y for x, y in zip(self.measure, self.bme.get_measure())]
             self.measure[4] += round(self.max4.get_luminance(), 0)
-            m = f"{self.masure[0]};{round(self.measure[1] / self.measure[0], 1)};"
-            m += f"{round(self.measure[2] / self.measure[0], 1)};"
-            m += f"{round(self.measure[3] / self.measure[0], 1)};"
-            m += f"{round(self.measure[4] / self.measure[0], 1)};"
-            print(f'echo "{m}"')
+            # m = f"{self.masure[0]};{round(self.measure[1] / self.measure[0], 1)};"
+            # m += f"{round(self.measure[2] / self.measure[0], 1)};"
+            # m += f"{round(self.measure[3] / self.measure[0], 1)};"
+            # m += f"{round(self.measure[4] / self.measure[0], 1)};"
+            # print(f'echo "{m}"')
 
     def save_measure(self):
         if self.cfg_status:
