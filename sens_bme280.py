@@ -21,7 +21,7 @@ class Bme280Sensor(object):
 
     def get_measure(self):
         self.data = bme280.sample(self.buss, self.ADDRESS, self.calibration_params)
-        self.data.pressure = self.data.pressure
+        self.data.pressure = self.data.pressure + 9
         return [1, round(self.data.temperature, 2), round(self.data.pressure, 1),
                 round(self.data.humidity), 0]
 
