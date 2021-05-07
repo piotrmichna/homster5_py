@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from time import sleep
 
@@ -92,9 +93,14 @@ class Weather(object):
         if self.cfg_status:
             self.measure = [x + y for x, y in zip(self.measure, self.bme.get_measure())]
             self.measure[4] += round(self.max4.get_luminance(), 0)
-            m = f"n={self.measure[0]}, t={self.measure[1]}, p={self.measure[2]},"
-            m += f"h={self.measure[3]}, l={self.measure[4]}"
-            print(m)
+            m = f"{self.masure[0]};{round(self.measure[1] / self.measure[0], 1)};"
+            m += f"{round(self.measure[2] / self.measure[0], 1)};"
+            m += f"{round(self.measure[3] / self.measure[0], 1)};"
+            m += f"{round(self.measure[4] / self.measure[0], 1)};"
+            filename = datetime.now().date()
+
+            os.system(f'echo "{m}" >> {filename}.txt')
+            os.system(f'echo "{m}"')
 
     def save_measure(self):
         if self.cfg_status:
@@ -102,7 +108,7 @@ class Weather(object):
             measure_data = {
                 'time_m': f'{time_probe}',
                 'temp_m': round(self.measure[1] / self.measure[0], 1),
-                'pres_m': round(self.measure[2] / self.measure[0]),
+                'pres_m': round(self.measure[2] / self.measure[0], 1),
                 'humi_m': round(self.measure[3] / self.measure[0], 1),
                 'ligh_m': round(self.measure[4] / self.measure[0]),
             }
