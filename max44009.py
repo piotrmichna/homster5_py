@@ -92,7 +92,7 @@ class Max44009(object):
         data = self.buss.read_i2c_block_data(self.ADDRESS, MAX44009_REG_LUX_HIGH, 2)
         exponent = (data[0] & 0xF0) >> 4
         mantissa = ((data[0] & 0x0F) << 4) | (data[1] & 0x0F)
-        self.luminance = round(((2 ** exponent) * mantissa) * 0.045, 2)
+        self.luminance = round(((2 ** exponent) * mantissa) * 0.045, 0)
 
         return self.luminance
 
