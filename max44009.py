@@ -64,7 +64,7 @@ class Max44009(object):
 
         self.buss = smbus2.SMBus(self.PORT)
         self.CONFIG = (MAX44009_REG_CONFIG_CONTMODE_CONTIN | MAX44009_REG_CONFIG_MANUAL_MODEON |
-                       MAX44009_REG_CONFIG_CDR_NODIVIDED | MAX44009_REG_CONFIG_INTRTIMER_800)
+                       MAX44009_REG_CONFIG_CDR_NODIVIDED | MAX44009_REG_CONFIG_INTRTIMER_100)
         self.write_config()
 
     def set_adres(self, adr=None, port=None):
